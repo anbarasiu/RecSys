@@ -1,8 +1,7 @@
 /*
 * Component to communicate with the Pinterest API and display the images
 * References : http://stackoverflow.com/questions/27731857/get-domain-name-for-pinterest-api
-*              https://api.pinterest.com/v3/search/pins/?join=via_pinner,board,pinner&page_size=50&query=travel&access_token=MTQzMTU5NDozNDYwMDMzMjEyODAwNTg4OTQ6OTIyMzM3MjAzNjg1NDc3NTgwN3wxNDYyNjQ4NDk1OjI1OTIwMDAtLWE2YzgyMWQyOTQ2MjViODk5ZjI5YTE3Y2U4MTBiYjM4
-* TODO: Git Ignore to Access Token file
+*              
 */
 
 import React from 'react'
