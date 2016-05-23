@@ -20714,20 +20714,31 @@
 	
 	var _superagent2 = _interopRequireDefault(_superagent);
 	
-	var _constants = __webpack_require__(/*! ./constants.jsx */ 177);
+	var _constants = __webpack_require__(/*! ./constants.jsx */ 175);
 	
 	var _constants2 = _interopRequireDefault(_constants);
 	
-	var _albumItem = __webpack_require__(/*! ./albumItem.jsx */ 175);
+	var _albumItem = __webpack_require__(/*! ./albumItem.jsx */ 176);
 	
 	var _albumItem2 = _interopRequireDefault(_albumItem);
 	
+	var _engine = __webpack_require__(/*! ./engine/engine.js */ 177);
+	
+	var _engine2 = _interopRequireDefault(_engine);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	/*
+	* Component to communicate with the Pinterest API and display the images
+	* References : http://stackoverflow.com/questions/27731857/get-domain-name-for-pinterest-api
+	*
+	*/
 	
 	var Album = _react2.default.createClass({
 	  displayName: 'Album',
 	  getInitialState: function getInitialState() {
 	    return {
+	      data: [],
 	      album: []
 	    };
 	  },
@@ -20743,7 +20754,10 @@
 	    var request = _superagent2.default.get('https://api.pinterest.com/v3/search/pins/', params).end(function (error, response) {
 	      if (response && response.status === 200) {
 	        var responseText = JSON.parse(response.text);
+	        _this.setState({ data: responseText.data });
 	        _this.setState({ album: responseText.data });
+	
+	        var engine = new _engine2.default(_this.state.data);
 	        console.log('Results acquired!', _this.state.album);
 	      } else console.log('Sadly, an error :(', error);
 	    });
@@ -20765,12 +20779,7 @@
 	      items
 	    );
 	  }
-	}); /*
-	    * Component to communicate with the Pinterest API and display the images
-	    * References : http://stackoverflow.com/questions/27731857/get-domain-name-for-pinterest-api
-	    *              https://api.pinterest.com/v3/search/pins/?join=via_pinner,board,pinner&page_size=50&query=travel&access_token=MTQzMTU5NDozNDYwMDMzMjEyODAwNTg4OTQ6OTIyMzM3MjAzNjg1NDc3NTgwN3wxNDYyNjQ4NDk1OjI1OTIwMDAtLWE2YzgyMWQyOTQ2MjViODk5ZjI5YTE3Y2U4MTBiYjM4
-	    * TODO: Git Ignore to Access Token file
-	    */
+	});
 	
 	exports.default = Album;
 
@@ -22305,11 +22314,33 @@
 /***/ },
 /* 175 */
 /*!**************************************!*\
+  !*** ./src/client/app/constants.jsx ***!
+  \**************************************/
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	/*
+	* https://api.pinterest.com/v3/search/pins/?join=via_pinner,board,pinner&page_size=50&query=travel&access_token=MTQzMTU5NDozNDYwMDMzMjEyODAwNTg4OTQ6OTIyMzM3MjAzNjg1NDc3NTgwN3wxNDYyNjQ4NDk1OjI1OTIwMDAtLWE2YzgyMWQyOTQ2MjViODk5ZjI5YTE3Y2U4MTBiYjM4
+	*/
+	
+	var CONSTANTS = {
+	  'ACCESS_TOKEN': 'MTQzMTU5NDozNDYwMDMzMjEyODAwNTg4OTQ6OTIyMzM3MjAzNjg1NDc3NTgwN3wxNDYyNjQ4NDk1OjI1OTIwMDAtLWE2YzgyMWQyOTQ2MjViODk5ZjI5YTE3Y2U4MTBiYjM4'
+	};
+	
+	exports.default = CONSTANTS;
+
+/***/ },
+/* 176 */
+/*!**************************************!*\
   !*** ./src/client/app/albumItem.jsx ***!
   \**************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -22322,7 +22353,7 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var AlbumItem = _react2.default.createClass({
-	  displayName: "AlbumItem",
+	  displayName: 'AlbumItem',
 	  getInitialState: function getInitialState() {
 	    return {
 	      item: this.props.item
@@ -22330,24 +22361,28 @@
 	  },
 	  render: function render() {
 	    var item = this.state.item;
-	    console.log(item.repin_count);
 	    return _react2.default.createElement(
-	      "div",
-	      { className: "card" },
+	      'div',
+	      { className: 'card' },
 	      _react2.default.createElement(
-	        "h3",
+	        'h3',
 	        null,
-	        " ",
+	        ' ',
 	        item.title,
-	        " "
+	        ' '
 	      ),
 	      _react2.default.createElement(
-	        "a",
+	        'span',
+	        null,
+	        item.weight === 1 ? 'You will love this' : 'Nahhh...'
+	      ),
+	      _react2.default.createElement(
+	        'a',
 	        { href: item.link },
-	        _react2.default.createElement("img", { src: item.image_medium_url, width: item.image_medium_size_pixels.width, height: item.image_medium_size_pixels.height })
+	        _react2.default.createElement('img', { src: item.image_medium_url, width: item.image_medium_size_pixels.width, height: item.image_medium_size_pixels.height })
 	      ),
 	      _react2.default.createElement(
-	        "div",
+	        'div',
 	        null,
 	        item.description
 	      )
@@ -22358,11 +22393,77 @@
 	exports.default = AlbumItem;
 
 /***/ },
-/* 176 */,
 /* 177 */
-/*!**************************************!*\
-  !*** ./src/client/app/constants.jsx ***!
-  \**************************************/
+/*!*****************************************!*\
+  !*** ./src/client/app/engine/engine.js ***!
+  \*****************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _keywordPool = __webpack_require__(/*! ./keyword-pool.js */ 178);
+	
+	var _keywordPool2 = _interopRequireDefault(_keywordPool);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Engine = function () {
+	  function Engine(props) {
+	    _classCallCheck(this, Engine);
+	
+	    this.dataset = props;
+	    this.applyWeightage();
+	  }
+	
+	  _createClass(Engine, [{
+	    key: 'applyWeightage',
+	    value: function applyWeightage() {
+	      var _this = this;
+	
+	      this.dataset.map(function (curr, index, arr) {
+	        var isFound = curr.description.split(' ').some(function (d) {
+	          return _this.contains(_keywordPool2.default, d);
+	        });
+	        return isFound ? curr.weight = 1 : curr.weight = 0;
+	      });
+	    }
+	  }, {
+	    key: 'printCurrent',
+	    value: function printCurrent() {
+	      console.log(this.dataset);
+	    }
+	  }, {
+	    key: 'contains',
+	    value: function contains(a, o) {
+	      a = a.join(',');
+	      try {
+	        return a.match(new RegExp('' + o + ''), 'i');
+	      } catch (e) {
+	        console.warn(e);
+	      }
+	
+	      //return a.indexOf.call(o) != -1 ? true : false;
+	    }
+	  }]);
+	
+	  return Engine;
+	}();
+	
+	exports.default = Engine;
+
+/***/ },
+/* 178 */
+/*!***********************************************!*\
+  !*** ./src/client/app/engine/keyword-pool.js ***!
+  \***********************************************/
 /***/ function(module, exports) {
 
 	'use strict';
@@ -22370,11 +22471,9 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	var CONSTANTS = {
-	  'ACCESS_TOKEN': 'MTQzMTU5NDozNDYwMDMzMjEyODAwNTg4OTQ6OTIyMzM3MjAzNjg1NDc3NTgwN3wxNDYyNjQ4NDk1OjI1OTIwMDAtLWE2YzgyMWQyOTQ2MjViODk5ZjI5YTE3Y2U4MTBiYjM4'
-	};
+	var keywordPool = ['indonesia', 'bali', 'spain', 'madrid', 'milan', 'florence', 'italy', 'france', 'paris', 'deep sea diving', 'nature', 'snow', 'india', 'shopping', 'culture'];
 	
-	exports.default = CONSTANTS;
+	exports.default = keywordPool;
 
 /***/ }
 /******/ ]);

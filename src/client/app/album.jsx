@@ -1,7 +1,7 @@
 /*
 * Component to communicate with the Pinterest API and display the images
 * References : http://stackoverflow.com/questions/27731857/get-domain-name-for-pinterest-api
-*              
+*
 */
 
 import React from 'react'
@@ -10,11 +10,13 @@ import $ from 'superagent';
 
 import CONSTANTS from './constants.jsx';
 import AlbumItem from './albumItem.jsx';
+import Engine from './engine/engine.js';
 
 var Album = React.createClass ({
 
   getInitialState(){
     return {
+      data : [],
       album : []
     };
   },
@@ -30,7 +32,10 @@ var Album = React.createClass ({
                     .end((error, response) => {
                     if(response && response.status === 200){
                       let responseText = JSON.parse(response.text);
+                      this.setState({data : responseText.data});
                       this.setState({album : responseText.data});
+
+                      let engine = new Engine(this.state.data);
                       console.log('Results acquired!', this.state.album);
                     }
                     else
